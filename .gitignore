@@ -1,5 +1,6 @@
 docs/
 data/raw/
 data/catalog/
+data/manifests/
 __pycache__/
 *.py[cod]

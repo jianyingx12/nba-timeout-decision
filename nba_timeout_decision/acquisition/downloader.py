@@ -10,6 +10,13 @@ from . import archive
 from .files import sha256, validate_parquet
 
 
+class DownloadError(RuntimeError):
+    def __init__(self, message: str, attempts: int, http_status: int | None = None) -> None:
+        super().__init__(message)
+        self.attempts = attempts
+        self.http_status = http_status
+
+
 def _cached_result(path: Path, source_url: str) -> dict[str, object]:
     size = validate_parquet(path)
     return {
@@ -18,6 +25,7 @@ def _cached_result(path: Path, source_url: str) -> dict[str, object]:
         "path": str(path),
         "bytes": size,
         "sha256": sha256(path),
+        "attempt": 0,
     }
 
 
@@ -35,18 +43,26 @@ def download(
     target = archive.local_path(output_root, data_type, season, season_type)
 
     if target.exists() and not refresh:
-        return _cached_result(target, source_url)
+        try:
+            return _cached_result(target, source_url)
+        except ValueError:
+            refresh = True
 
     target.parent.mkdir(parents=True, exist_ok=True)
     temporary = target.with_name(f".{target.name}.part-{os.getpid()}")
     last_error: Exception | None = None
+    last_http_status: int | None = None
 
     for attempt in range(1, attempts + 1):
         try:
             request = Request(source_url, headers={"User-Agent": "nba-timeout-decision"})
             with urlopen(request, timeout=timeout_seconds) as response:
+                http_status = response.status
                 size_header = response.headers.get("Content-Length")
                 expected_size = int(size_header) if size_header else None
+                revision = response.headers.get("X-Repo-Commit")
+                object_id = response.headers.get("X-Linked-Etag") or response.headers.get("ETag")
+                object_id = object_id.strip('"') if object_id else None
                 with temporary.open("wb") as destination:
                     while chunk := response.read(1024 * 1024):
                         destination.write(chunk)
@@ -61,11 +77,19 @@ def download(
                 "bytes": size,
                 "sha256": digest,
                 "attempt": attempt,
+                "http_status": http_status,
+                "source_revision": revision,
+                "source_object_id": object_id,
             }
         except (HTTPError, URLError, TimeoutError, OSError, ValueError) as error:
             last_error = error
+            last_http_status = error.code if isinstance(error, HTTPError) else None
             temporary.unlink(missing_ok=True)
             if attempt < attempts:
                 time.sleep(2 ** (attempt - 1))
 
-    raise RuntimeError(f"Download failed after {attempts} attempts: {last_error}") from last_error
+    raise DownloadError(
+        f"Download failed after {attempts} attempts: {last_error}",
+        attempts=attempts,
+        http_status=last_http_status,
+    ) from last_error

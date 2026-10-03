@@ -2,10 +2,12 @@
 
 import argparse
 import json
+import sys
 from pathlib import Path
 
 from .archive import DATA_TYPES, SEASON_TYPES
-from .downloader import download
+from .downloader import DownloadError, download
+from .manifest import failure_record, success_record, upsert
 
 
 def parse_args() -> argparse.Namespace:
@@ -14,6 +16,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--season", required=True, type=int)
     parser.add_argument("--season-type", required=True, choices=SEASON_TYPES)
     parser.add_argument("--output-root", type=Path, default=Path("data/raw"))
+    parser.add_argument(
+        "--manifest", type=Path, default=Path("data/manifests/partitions.csv")
+    )
     parser.add_argument("--refresh", action="store_true")
     parser.add_argument("--attempts", type=int, default=4)
     parser.add_argument("--timeout-seconds", type=float, default=60.0)
@@ -30,15 +35,38 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
-    result = download(
+    try:
+        result = download(
+            data_type=args.data_type,
+            season=args.season,
+            season_type=args.season_type,
+            output_root=args.output_root,
+            refresh=args.refresh,
+            attempts=args.attempts,
+            timeout_seconds=args.timeout_seconds,
+        )
+    except DownloadError as error:
+        record = failure_record(
+            data_type=args.data_type,
+            season=args.season,
+            season_type=args.season_type,
+            output_root=args.output_root,
+            attempts=error.attempts,
+            http_status=error.http_status,
+            error=str(error),
+        )
+        upsert(args.manifest, record)
+        print(json.dumps(record, indent=2, sort_keys=True), file=sys.stderr)
+        raise SystemExit(1) from error
+
+    record = success_record(
         data_type=args.data_type,
         season=args.season,
         season_type=args.season_type,
-        output_root=args.output_root,
-        refresh=args.refresh,
-        attempts=args.attempts,
-        timeout_seconds=args.timeout_seconds,
+        result=result,
     )
+    upsert(args.manifest, record)
+    result["manifest"] = str(args.manifest)
     print(json.dumps(result, indent=2, sort_keys=True))
 
 
