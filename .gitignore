@@ -1,4 +1,5 @@
 docs/
 data/raw/
+data/catalog/
 __pycache__/
 *.py[cod]

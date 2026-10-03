@@ -22,3 +22,7 @@ def local_path(
     output_root: Path, data_type: str, season: int, season_type: str
 ) -> Path:
     return output_root / data_type / str(season) / f"{season_type}.parquet"
+
+
+def catalog_path(output_root: Path, season: int, season_type: str) -> Path:
+    return output_root / str(season) / f"{season_type}.csv"
