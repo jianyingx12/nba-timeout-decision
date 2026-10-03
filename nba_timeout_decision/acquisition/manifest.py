@@ -28,6 +28,7 @@ FIELDS = (
     "file_size",
 )
 KEY_FIELDS = ("data_type", "season", "game_type")
+PartitionKey = tuple[str, int, str]
 
 
 def success_record(
@@ -83,18 +84,32 @@ def failure_record(
     }
 
 
-def _key(record: dict[str, object]) -> tuple[str, str, str]:
-    return tuple(str(record[field]) for field in KEY_FIELDS)
+def key(record: dict[str, object]) -> PartitionKey:
+    return (
+        str(record["data_type"]),
+        int(record["season"]),
+        str(record["game_type"]),
+    )
+
+
+def read(path: Path) -> tuple[dict[PartitionKey, dict[str, str]], list[PartitionKey]]:
+    records: dict[PartitionKey, dict[str, str]] = {}
+    duplicates: list[PartitionKey] = []
+    if not path.exists():
+        return records, duplicates
+
+    with path.open(encoding="utf-8", newline="") as source:
+        for record in csv.DictReader(source):
+            record_key = key(record)
+            if record_key in records:
+                duplicates.append(record_key)
+            records[record_key] = record
+    return records, duplicates
 
 
 def upsert(path: Path, record: dict[str, object | None]) -> None:
-    records: dict[tuple[str, str, str], dict[str, str]] = {}
-    if path.exists():
-        with path.open(encoding="utf-8", newline="") as source:
-            for existing in csv.DictReader(source):
-                records[_key(existing)] = existing
-
-    record_key = _key(record)
+    records, _ = read(path)
+    record_key = key(record)
     merged = records.get(record_key, {field: "" for field in FIELDS})
     for field, value in record.items():
         if value is not None:
