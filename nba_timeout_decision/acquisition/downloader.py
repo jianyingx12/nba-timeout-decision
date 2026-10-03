@@ -52,8 +52,10 @@ def download(
     temporary = target.with_name(f".{target.name}.part-{os.getpid()}")
     last_error: Exception | None = None
     last_http_status: int | None = None
+    attempts_made = 0
 
     for attempt in range(1, attempts + 1):
+        attempts_made = attempt
         try:
             request = Request(source_url, headers={"User-Agent": "nba-timeout-decision"})
             with urlopen(request, timeout=timeout_seconds) as response:
@@ -85,11 +87,13 @@ def download(
             last_error = error
             last_http_status = error.code if isinstance(error, HTTPError) else None
             temporary.unlink(missing_ok=True)
-            if attempt < attempts:
-                time.sleep(2 ** (attempt - 1))
+            retryable = not isinstance(error, HTTPError) or error.code in {408, 429} or error.code >= 500
+            if attempt >= attempts or not retryable:
+                break
+            time.sleep(2 ** (attempt - 1))
 
     raise DownloadError(
-        f"Download failed after {attempts} attempts: {last_error}",
-        attempts=attempts,
+        f"Download failed after {attempts_made} attempts: {last_error}",
+        attempts=attempts_made,
         http_status=last_http_status,
     ) from last_error
