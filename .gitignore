@@ -4,5 +4,6 @@ data/catalog/
 data/manifests/
 data/reports/
 data/normalized/
+data/derived/
 __pycache__/
 *.py[cod]
