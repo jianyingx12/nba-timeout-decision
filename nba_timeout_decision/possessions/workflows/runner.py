@@ -6,7 +6,7 @@ from pathlib import Path
 import pyarrow.parquet as parquet
 
 from ..contract import POSSESSION_SCHEMA
-from ..io.manifest import partition_key, read_manifest, upsert_partition
+from ...io.manifest import partition_key, read_manifest, upsert_partition
 from ..io.source import validate_source_partition
 from ..io.storage import inspect_partition, possession_path, write_partition
 from .partition import INPUT_COLUMNS, reconstruct_partition

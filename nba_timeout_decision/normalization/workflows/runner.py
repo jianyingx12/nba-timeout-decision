@@ -5,8 +5,9 @@ from pathlib import Path
 
 import pyarrow.parquet as parquet
 
-from ..io.manifest import partition_key, read_manifest, upsert_partition
-from ..io.storage import inspect_partition, normalized_path, sha256, write_partition
+from ...io.files import sha256
+from ...io.manifest import partition_key, read_manifest, upsert_partition
+from ..io.storage import inspect_partition, normalized_path, write_partition
 from .pipeline import CANONICAL_COLUMNS, normalize_partition
 
 PIPELINE_VERSION = 2

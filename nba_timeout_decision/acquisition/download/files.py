@@ -1,18 +1,9 @@
 """Downloaded file validation and hashing."""
 
-import hashlib
 import os
 from pathlib import Path
 
 PARQUET_MAGIC = b"PAR1"
-
-
-def sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as source:
-        for chunk in iter(lambda: source.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
 
 
 def validate_parquet(path: Path, expected_size: int | None = None) -> int:

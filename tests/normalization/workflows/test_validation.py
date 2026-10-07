@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pyarrow as pa
 
-from nba_timeout_decision.normalization.io.manifest import upsert_partition
+from nba_timeout_decision.io.manifest import upsert_partition
 from nba_timeout_decision.normalization.io.storage import write_partition
 from nba_timeout_decision.normalization.workflows.pipeline import CANONICAL_COLUMNS
 from nba_timeout_decision.normalization.workflows.runner import PIPELINE_VERSION

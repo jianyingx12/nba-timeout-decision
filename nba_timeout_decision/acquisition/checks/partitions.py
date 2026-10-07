@@ -4,7 +4,8 @@ from pathlib import Path
 
 import pyarrow.parquet as parquet
 
-from ..download.files import sha256, validate_parquet
+from ...io.files import sha256
+from ..download.files import validate_parquet
 from ..download.manifest import PartitionKey
 
 SEASON_TYPE_CODES = {"regular": "rg", "playoffs": "po"}

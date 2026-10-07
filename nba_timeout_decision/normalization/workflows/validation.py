@@ -9,7 +9,7 @@ from pathlib import Path
 import pyarrow.parquet as parquet
 
 from .batch import GAME_TYPES
-from ..io.manifest import partition_key, read_manifest
+from ...io.manifest import partition_key, read_manifest
 from ..io.storage import inspect_partition
 from .pipeline import CANONICAL_COLUMNS
 from .runner import PIPELINE_VERSION

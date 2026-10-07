@@ -8,14 +8,14 @@ from pathlib import Path
 
 import pyarrow.parquet as parquet
 
-from ...possessions.io.storage import sha256
+from ...io.files import sha256
+from ...io.manifest import partition_key, read_manifest
 from ..contract import (
     RUN_SCHEMA,
     SENSITIVITY_SIGNAL_SCHEMA,
     THRESHOLD_CROSSING_SCHEMA,
 )
 from ..io.catalog import read_game_teams
-from ..io.manifest import partition_key, read_manifest
 from ..io.source import validate_source_partition
 from ..io.storage import inspect_output, output_paths
 from ..workflows.partition import detect_partition

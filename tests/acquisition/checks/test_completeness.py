@@ -9,7 +9,7 @@ import pyarrow as pa
 import pyarrow.parquet as parquet
 
 from nba_timeout_decision.acquisition.checks.completeness import build_report
-from nba_timeout_decision.acquisition.download.files import sha256
+from nba_timeout_decision.io.files import sha256
 from nba_timeout_decision.acquisition.download.manifest import FIELDS
 
 

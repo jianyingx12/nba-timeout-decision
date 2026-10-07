@@ -6,8 +6,8 @@ from pathlib import Path
 import pyarrow.parquet as parquet
 
 from ...possessions.contract import POSSESSION_SCHEMA
-from ...possessions.io.manifest import partition_key, read_manifest
-from ...possessions.io.storage import sha256
+from ...io.files import sha256
+from ...io.manifest import partition_key, read_manifest
 from ...possessions.workflows.runner import RECONSTRUCTION_VERSION
 
 

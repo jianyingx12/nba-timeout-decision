@@ -1,4 +1,4 @@
-"""Read and update the possession reconstruction manifest."""
+"""Read and atomically update partition manifests."""
 
 import json
 import os
@@ -14,13 +14,12 @@ def partition_key(season: int, game_type: str) -> str:
 def read_manifest(path: Path) -> dict[str, object]:
     if not path.exists():
         return {"format_version": FORMAT_VERSION, "partitions": {}}
-
     with path.open(encoding="utf-8") as source:
         manifest = json.load(source)
     if manifest.get("format_version") != FORMAT_VERSION:
-        raise ValueError("Unsupported possession manifest version")
+        raise ValueError("Unsupported partition manifest version")
     if not isinstance(manifest.get("partitions"), dict):
-        raise ValueError("Possession manifest has invalid partitions")
+        raise ValueError("Partition manifest has invalid partitions")
     return manifest
 
 

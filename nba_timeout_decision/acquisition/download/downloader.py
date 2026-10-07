@@ -7,7 +7,8 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 from . import archive
-from .files import sha256, validate_parquet
+from ...io.files import sha256
+from .files import validate_parquet
 
 
 class DownloadError(RuntimeError):

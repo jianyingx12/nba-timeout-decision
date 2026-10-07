@@ -7,14 +7,14 @@ from pathlib import Path
 import pyarrow as pa
 import pyarrow.parquet as parquet
 
-from ...possessions.io.storage import sha256
+from ...io.files import sha256
+from ...io.manifest import partition_key, read_manifest, upsert_partition
 from ..contract import (
     RUN_SCHEMA,
     SENSITIVITY_SIGNAL_SCHEMA,
     THRESHOLD_CROSSING_SCHEMA,
 )
 from ..io.catalog import read_game_teams
-from ..io.manifest import partition_key, read_manifest, upsert_partition
 from ..io.source import validate_source_partition
 from ..io.storage import (
     OutputPaths,

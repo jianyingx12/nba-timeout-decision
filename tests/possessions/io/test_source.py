@@ -7,11 +7,11 @@ from pathlib import Path
 import pyarrow as pa
 import pyarrow.parquet as parquet
 
-from nba_timeout_decision.normalization.io.manifest import write_manifest
+from nba_timeout_decision.io.files import sha256
+from nba_timeout_decision.io.manifest import write_manifest
 from nba_timeout_decision.normalization.workflows.pipeline import CANONICAL_COLUMNS
 from nba_timeout_decision.normalization.workflows.runner import PIPELINE_VERSION
 from nba_timeout_decision.possessions.io.source import validate_source_partition
-from nba_timeout_decision.possessions.io.storage import sha256
 
 
 class PossessionSourceTests(unittest.TestCase):

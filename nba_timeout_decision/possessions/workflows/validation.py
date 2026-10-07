@@ -9,7 +9,7 @@ from pathlib import Path
 import pyarrow.parquet as parquet
 
 from ..contract import POSSESSION_SCHEMA
-from ..io.manifest import partition_key, read_manifest
+from ...io.manifest import partition_key, read_manifest
 from ..io.source import validate_source_partition
 from ..io.storage import inspect_partition
 from ..validation.checks import check_partition

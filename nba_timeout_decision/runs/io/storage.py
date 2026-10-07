@@ -7,7 +7,7 @@ from pathlib import Path
 import pyarrow as pa
 import pyarrow.parquet as parquet
 
-from ...possessions.io.storage import sha256
+from ...io.files import sha256
 from ..contract import (
     RUN_SCHEMA,
     SENSITIVITY_SIGNAL_SCHEMA,

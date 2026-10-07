@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 import pyarrow as pa
 
-from nba_timeout_decision.normalization.io.manifest import read_manifest
+from nba_timeout_decision.io.manifest import read_manifest
 from nba_timeout_decision.normalization.workflows.pipeline import (
     CANONICAL_COLUMNS,
     PartitionNormalization,

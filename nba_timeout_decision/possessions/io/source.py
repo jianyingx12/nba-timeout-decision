@@ -5,10 +5,10 @@ from pathlib import Path
 
 import pyarrow.parquet as parquet
 
-from ...normalization.io.manifest import partition_key, read_manifest
+from ...io.files import sha256
+from ...io.manifest import partition_key, read_manifest
 from ...normalization.workflows.pipeline import CANONICAL_COLUMNS
 from ...normalization.workflows.runner import PIPELINE_VERSION
-from .storage import sha256
 
 
 @dataclass(frozen=True)

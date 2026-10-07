@@ -1,12 +1,13 @@
 """Write and inspect normalized event partitions."""
 
-import hashlib
 import os
 from dataclasses import dataclass
 from pathlib import Path
 
 import pyarrow as pa
 import pyarrow.parquet as parquet
+
+from ...io.files import sha256
 
 
 @dataclass(frozen=True)
@@ -21,14 +22,6 @@ def normalized_path(
     output_root: Path, season: int, game_type: str
 ) -> Path:
     return output_root / str(season) / f"{game_type}.parquet"
-
-
-def sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as source:
-        for chunk in iter(lambda: source.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
 
 
 def inspect_partition(path: Path) -> StoredPartition:

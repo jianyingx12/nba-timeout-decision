@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pyarrow.parquet as parquet
 
-from ..download.files import sha256
+from ...io.files import sha256
 
 SOURCE_COLUMNS = (
     "GAME_ID",

@@ -1,13 +1,14 @@
-"""Tests for the scoring-run manifest."""
+"""Tests for shared partition manifests."""
 
+import json
 import tempfile
 import unittest
 from pathlib import Path
 
-from nba_timeout_decision.runs.io.manifest import read_manifest, upsert_partition
+from nba_timeout_decision.io.manifest import read_manifest, upsert_partition
 
 
-class RunManifestTests(unittest.TestCase):
+class PartitionManifestTests(unittest.TestCase):
     def test_upsert_preserves_other_partitions(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "manifest.json"
@@ -24,6 +25,18 @@ class RunManifestTests(unittest.TestCase):
                     "2025/regular": {"status": "complete"},
                 },
             )
+            self.assertEqual(list(path.parent.glob("*.part-*")), [])
+
+    def test_rejects_unknown_manifest_version(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "manifest.json"
+            path.write_text(
+                json.dumps({"format_version": 2, "partitions": {}}),
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(ValueError, "manifest version"):
+                read_manifest(path)
 
 
 if __name__ == "__main__":
